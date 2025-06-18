@@ -1,25 +1,46 @@
-import { useSignal } from "@preact/signals";
-import Counter from "../islands/Counter.tsx";
+import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
+import Axios from "axios";
+import CharacterContainer from "../components/CharacterContainer.tsx";
 
-export default function Home() {
-  const count = useSignal(3);
-  return (
-    <div class="px-4 py-8 mx-auto bg-[#86efac]">
-      <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
-        <img
-          class="my-6"
-          src="/logo.svg"
-          width="128"
-          height="128"
-          alt="the Fresh logo: a sliced lemon dripping with juice"
-        />
-        <h1 class="text-4xl font-bold">Welcome to Fresh</h1>
-        <p class="my-4">
-          Try updating this message in the
-          <code class="mx-2">./routes/index.tsx</code> file, and refresh.
-        </p>
-        <Counter count={count} />
-      </div>
-    </div>
-  );
+type Character = {
+  id: string,
+  name: string,
+  image: string
+  house: string,
+  alive: boolean
+}
+
+type Data = {
+  characters: Array<Character>
+}
+
+type CharacterAPI = {
+  results: Array<{
+    id: string,
+    name: string,
+    image: string
+    house: string,
+    alive: boolean
+  }>
+}
+
+export const handler: Handlers = {
+  GET: async (req: Request, ctx: FreshContext<unknown, Data>) => {
+    const webURL = new URL(req.url);
+    let url = "https://hp-api.onrender.com/api/characters";
+
+    try{
+      const response = await Axios.get<CharacterAPI>(url);
+      return ctx.render({characters: response.data.results})
+    }catch(e){
+      return new Response("Error de API");
+    }
+  }
+}
+
+export default (props: PageProps<Data>) => {
+  const characters = props.data.characters;
+  return (characters.map((ch) => {
+    <CharacterContainer character={ch} />
+  }))
 }
