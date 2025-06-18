@@ -1,4 +1,4 @@
-/*import { FunctionalComponent } from "preact/src/index.d.ts";
+import { FunctionalComponent } from "preact/src/index.d.ts";
 import CharacterCard from "./CharacterCard.tsx";
 
 type Character = {
@@ -27,4 +27,4 @@ const CharactersContainer: FunctionalComponent<Props> = (props) => {
     )
 }
 
-export default CharactersContainer;*/
+export default CharactersContainer;
